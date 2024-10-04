@@ -122,7 +122,7 @@ namespace ReportLockerApp
                     case "check":
                         ReportLocker.Protection result = reportLocker.GetProtection(file);
 
-                        Console.WriteLine($"Report {file} is {result.ToString()}");
+                        Console.WriteLine($"Report {file} is {result}");
                         break;
 
                     case "sign":
