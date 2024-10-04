@@ -10,13 +10,19 @@ namespace ReportLockerApp
         {
             if (args.Length < 2)
             {
-                Console.WriteLine("Usage ReportLocker <--lock|--unlock|--check> <file|folder> [key]");
+                Console.WriteLine("Usage ReportLocker <--lock|--unlock|--check|--sign> <file|folder> [key|signature] [sheet] [row] [column]");
                 return;
             }
 
             if (args[0] == "--lock" && args.Length < 3)
             {
                 Console.WriteLine("Use of --lock require a key value");
+                return;
+            }
+
+            if (args[0] == "--sign" && args.Length < 6)
+            {
+                Console.WriteLine("Use of --sign require signature, sheet, row and column values");
                 return;
             }
 
@@ -44,14 +50,14 @@ namespace ReportLockerApp
             {
                 if (args[0] == "--lock")
                 {
-                    if(reportLocker.Lock(args[1], args[2]))
+                    if (reportLocker.Lock(args[1], args[2]))
                         Console.WriteLine("Report {0} locked", args[1]);
                     else
                         Console.WriteLine("Report {0} lock failed", args[1]);
                 }
                 else if (args[0] == "--unlock")
                 {
-                    if(reportLocker.Unlock(args[1]))
+                    if (reportLocker.Unlock(args[1]))
                         Console.WriteLine("Report {0} unlocked", args[1]);
                     else
                         Console.WriteLine("Report {0} unlock failed", args[1]);
@@ -61,6 +67,15 @@ namespace ReportLockerApp
                     ReportLocker.Protection result = reportLocker.GetProtection(args[1]);
 
                     Console.WriteLine("Report {0} is {1}", args[1], result.ToString());
+                }
+                else if (args[0] == "--sign")
+                {
+                    if (!uint.TryParse(args[4], out uint row))
+                        Console.WriteLine("Wrong format for row parameter");
+                    else if (reportLocker.SignReport(args[1], args[2], args[3], row, args[5]))
+                        Console.WriteLine("Report {0} signed", args[1]);
+                    else
+                        Console.WriteLine("Report {0} not signed", args[1]);
                 }
             }
             else 
