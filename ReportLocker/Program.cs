@@ -59,30 +59,34 @@ namespace ReportLockerApp
                     return;
             }
 
-            string extension = Path.GetExtension(args[1]).ToLower();
-
             var dir = new DirectoryInfo(args[1]);
 
-            bool folder = dir.Exists;
-
-            if (!folder && !extension.Equals(".xlsx"))
+            if (!dir.Exists && !File.Exists(args[1]))
             {
-                Console.WriteLine("{0} files are not allowed (only xlsx)", extension);
-                return;
-            }
-
-            if (!folder && !File.Exists(args[1]))
-            {
-                Console.WriteLine("File {0} must exist", args[1]);
+                Console.WriteLine($"File {args[1]} must exist");
                 return;
             }
 
             string[] files;
 
-            if (folder)
+            if (dir.Exists)
                 files = Directory.GetFiles(args[1], "*.xlsx");
             else
             {
+                string extension = Path.GetExtension(args[1]).ToLower();
+
+                if (string.IsNullOrEmpty(extension))
+                {
+                    Console.WriteLine("Cannot process files without extension");
+                    return;
+                }
+
+                if (!extension.Equals(".xlsx"))
+                {
+                    Console.WriteLine($"{extension} files are not allowed (only xlsx)");
+                    return;
+                }
+
                 files = new string[1];
                 files[0] = args[1];
             }
@@ -99,44 +103,44 @@ namespace ReportLockerApp
                         if (reportLocker.Lock(file, args[2]))
                         {
                             count++;
-                            Console.WriteLine("Report {0} locked", file);
+                            Console.WriteLine($"Report {file} locked");
                         }
                         else
-                            Console.WriteLine("Report {0} lock failed", file);
+                            Console.WriteLine($"Report {file} lock failed");
                         break;
 
                     case "unlock":
                         if (reportLocker.Unlock(file))
                         {
                             count++;
-                            Console.WriteLine("Report {0} unlocked", file);
+                            Console.WriteLine($"Report {file} unlocked");
                         }
                         else
-                            Console.WriteLine("Report {0} unlock failed", file);
+                            Console.WriteLine($"Report {file} unlock failed");
                         break;
 
                     case "check":
                         ReportLocker.Protection result = reportLocker.GetProtection(file);
 
-                        Console.WriteLine("Report {0} is {1}", file, result.ToString());
+                        Console.WriteLine($"Report {file} is {result.ToString()}");
                         break;
 
                     case "sign":
                         if (reportLocker.SignReport(file, args[2], args[3], row, args[5]))
-                            Console.WriteLine("Report {0} signed", file);
+                            Console.WriteLine($"Report {file} signed");
                         else
-                            Console.WriteLine("Report {0} not signed", file);
+                            Console.WriteLine($"Report {file} not signed");
                         break;
 
                     //TODO: check signature
 
                     default:
-                        Console.WriteLine("Uknown option: {0}", @switch);
+                        Console.WriteLine($"Unknown switch: {@switch}");
                         break;
                 }
             }
 
-            Console.WriteLine("{0} files {1} processed ", files.Length, count);
+            Console.WriteLine($"{files.Length} files, {count} processed");
         }
     }
 }
