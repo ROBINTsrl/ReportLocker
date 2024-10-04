@@ -87,6 +87,7 @@ csx/
 AppPackages/
 
 # Others
+.vs/
 sql/
 *.Cache
 ClientBin/
@@ -131,11 +132,3 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
-/.vs/ReportLocker/FileContentIndex/1ac27f71-36a5-42f7-9648-5ba6331f0e42.vsidx
-/.vs/ReportLocker/FileContentIndex/2c44f577-633c-4f81-b7b9-96fef101e545.vsidx
-/.vs/ReportLocker/FileContentIndex/84cd1441-0b42-4903-9d22-b5bcf712cb0a.vsidx
-/.vs/ReportLocker/FileContentIndex/e1ae8b0e-bbd0-4f61-88b2-6ed73256ead9.vsidx
-/.vs/ReportLocker/v17/DocumentLayout.backup.json
-/.vs/ReportLocker/v17/DocumentLayout.json
-/.vs/ReportLocker/FileContentIndex/1ac27f71-36a5-42f7-9648-5ba6331f0e42.vsidx
-/.vs/ReportLocker/FileContentIndex/2c44f577-633c-4f81-b7b9-96fef101e545.vsidx

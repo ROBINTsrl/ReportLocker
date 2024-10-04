@@ -12,15 +12,13 @@ namespace ReportLockerAPI
             Locked = 1,
             Crypted = 2
         }
-
         public ReportLocker()
         {
         }
-
         protected string HexPasswordConversion(string password)
         {
             byte[] passwordCharacters = System.Text.Encoding.ASCII.GetBytes(password);
-            
+
             int hash = 0;
 
             if (passwordCharacters.Length > 0)
@@ -138,7 +136,62 @@ namespace ReportLockerAPI
 
             return Protection.Unlocked;
         }
+        public string GetProtectionString(string report)
+        {
+            return GetProtection(report).ToString();
+        }
+        public bool SignReport(string report, string signature, int row, int column)
+        {
+            if (string.IsNullOrEmpty(report))
+                throw new ArgumentException("Report file required");
 
+            if (!System.IO.File.Exists(report))
+                throw new ArgumentException("Report file must exist");
+
+            try
+            {
+                using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, true))
+                {
+                    //TODO: place signature at row,column
+                }
+            }
+            catch (System.IO.FileFormatException)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return true;
+        }
+        public bool IsSigned(string report, string signature, int row, int column)
+        {
+            if (string.IsNullOrEmpty(report))
+                throw new ArgumentException("Report file required");
+
+            if (!System.IO.File.Exists(report))
+                throw new ArgumentException("Report file must exist");
+
+            try
+            {
+                using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, false))
+                {
+                    //TODO get specific cell value
+                }
+            }
+            catch (System.IO.FileFormatException)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return false;
+        }
         public static ReportLocker Create() { return new ReportLocker(); }
     }
 }
