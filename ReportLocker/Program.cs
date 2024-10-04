@@ -8,7 +8,7 @@ namespace ReportLockerApp
     {
         static void PrintUsage()
         {
-            Console.WriteLine("Usage ReportLocker <--help|--lock|--unlock|--check|--sign> <file|folder|topic> [key|signature] [sheet] [row] [column]");
+            Console.WriteLine($"Usage {System.Reflection.Assembly.GetExecutingAssembly().GetName().Name} <--help|--lock|--unlock|--check|--sign> <file|folder|topic> [key|signature] [sheet] [row] [column]");
         }
         static void Main(string[] args)
         {
@@ -18,9 +18,11 @@ namespace ReportLockerApp
                 return;
             }
 
-            if (args.Length == 2 && args[0] == "--help")
+            string command = args[0].ToLower();
+
+            if (args.Length == 2 && command == "--help")
             {
-                switch (args[1])
+                switch (args[1].ToLower())
                 {
                     case "lock":
                         Console.WriteLine("Lock xlsx report/reports with key provided");
@@ -29,7 +31,7 @@ namespace ReportLockerApp
                         Console.WriteLine("Unlock xlsx report/reports");
                         break;
                     case "check":
-                        Console.WriteLine("Unlock xlsx report/reports");
+                        Console.WriteLine("Check protection on report/reports");
                         break;
                     case "sign":
                         Console.WriteLine("Sign xlsx report/reports with signature at specified sheet, row, column coordinate");
@@ -38,11 +40,13 @@ namespace ReportLockerApp
                         Console.WriteLine("Unknown topic");
                         break;
                 }
+
+                return;
             }
 
             uint row = 0;
 
-            switch (args[0])
+            switch (command)
             {
                 case "--lock" when args.Length < 3:
                     Console.WriteLine("Use of --lock require a key value");
@@ -89,7 +93,7 @@ namespace ReportLockerApp
 
             foreach (string file in files)
             {
-                switch (args[0])
+                switch (command)
                 {
                     case "--lock":
                         if (reportLocker.Lock(file, args[2]))
@@ -122,6 +126,12 @@ namespace ReportLockerApp
                             Console.WriteLine("Report {0} signed", file);
                         else
                             Console.WriteLine("Report {0} not signed", file);
+                        break;
+
+                    //TODO: check signature
+
+                    default:
+                        Console.WriteLine("Uknown option: {0}", command);
                         break;
                 }
             }
