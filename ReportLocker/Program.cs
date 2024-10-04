@@ -18,9 +18,9 @@ namespace ReportLockerApp
                 return;
             }
 
-            string command = args[0].ToLower();
+            string @switch = args[0].ToLower().TrimStart('-');
 
-            if (args.Length == 2 && command == "--help")
+            if (args.Length == 2 && @switch == "help")
             {
                 switch (args[1].ToLower())
                 {
@@ -46,15 +46,15 @@ namespace ReportLockerApp
 
             uint row = 0;
 
-            switch (command)
+            switch (@switch)
             {
-                case "--lock" when args.Length < 3:
+                case "lock" when args.Length < 3:
                     Console.WriteLine("Use of --lock require a key value");
                     return;
-                case "--sign" when args.Length < 6:
+                case "sign" when args.Length < 6:
                     Console.WriteLine("Use of --sign require signature, sheet, row and column values");
                     return;
-                case "--sign" when !uint.TryParse(args[4], out row):
+                case "sign" when !uint.TryParse(args[4], out row):
                     Console.WriteLine("Wrong format for row parameter");
                     return;
             }
@@ -93,9 +93,9 @@ namespace ReportLockerApp
 
             foreach (string file in files)
             {
-                switch (command)
+                switch (@switch)
                 {
-                    case "--lock":
+                    case "lock":
                         if (reportLocker.Lock(file, args[2]))
                         {
                             count++;
@@ -105,7 +105,7 @@ namespace ReportLockerApp
                             Console.WriteLine("Report {0} lock failed", file);
                         break;
 
-                    case "--unlock":
+                    case "unlock":
                         if (reportLocker.Unlock(file))
                         {
                             count++;
@@ -115,13 +115,13 @@ namespace ReportLockerApp
                             Console.WriteLine("Report {0} unlock failed", file);
                         break;
 
-                    case "--check":
+                    case "check":
                         ReportLocker.Protection result = reportLocker.GetProtection(file);
 
                         Console.WriteLine("Report {0} is {1}", file, result.ToString());
                         break;
 
-                    case "--sign":
+                    case "sign":
                         if (reportLocker.SignReport(file, args[2], args[3], row, args[5]))
                             Console.WriteLine("Report {0} signed", file);
                         else
@@ -131,7 +131,7 @@ namespace ReportLockerApp
                     //TODO: check signature
 
                     default:
-                        Console.WriteLine("Uknown option: {0}", command);
+                        Console.WriteLine("Uknown option: {0}", @switch);
                         break;
                 }
             }
