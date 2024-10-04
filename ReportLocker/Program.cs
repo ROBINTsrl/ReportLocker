@@ -6,35 +6,64 @@ namespace ReportLockerApp
 {
     internal class Program
     {
+        static void PrintUsage()
+        {
+            Console.WriteLine("Usage ReportLocker <--help|--lock|--unlock|--check|--sign> <file|folder|topic> [key|signature] [sheet] [row] [column]");
+        }
         static void Main(string[] args)
         {
             if (args.Length < 2)
             {
-                Console.WriteLine("Usage ReportLocker <--lock|--unlock|--check|--sign> <file|folder> [key|signature] [sheet] [row] [column]");
+                PrintUsage();
                 return;
             }
 
-            if (args[0] == "--lock" && args.Length < 3)
+            if (args.Length == 2 && args[0] == "--help")
             {
-                Console.WriteLine("Use of --lock require a key value");
-                return;
+                switch (args[1])
+                {
+                    case "lock":
+                        Console.WriteLine("Lock xlsx report/reports with key provided");
+                        break;
+                    case "unlock":
+                        Console.WriteLine("Unlock xlsx report/reports");
+                        break;
+                    case "check":
+                        Console.WriteLine("Unlock xlsx report/reports");
+                        break;
+                    case "sign":
+                        Console.WriteLine("Sign xlsx report/reports with signature at specified sheet, row, column coordinate");
+                        break;
+                    default:
+                        Console.WriteLine("Unknown topic");
+                        break;
+                }
             }
 
-            if (args[0] == "--sign" && args.Length < 6)
+            uint row = 0;
+
+            switch (args[0])
             {
-                Console.WriteLine("Use of --sign require signature, sheet, row and column values");
-                return;
+                case "--lock" when args.Length < 3:
+                    Console.WriteLine("Use of --lock require a key value");
+                    return;
+                case "--sign" when args.Length < 6:
+                    Console.WriteLine("Use of --sign require signature, sheet, row and column values");
+                    return;
+                case "--sign" when !uint.TryParse(args[4], out row):
+                    Console.WriteLine("Wrong format for row parameter");
+                    return;
             }
 
             string extension = Path.GetExtension(args[1]).ToLower();
 
-            DirectoryInfo dir = new DirectoryInfo(args[1]);
+            var dir = new DirectoryInfo(args[1]);
 
             bool folder = dir.Exists;
 
             if (!folder && !extension.Equals(".xlsx"))
             {
-                Console.WriteLine("{0} file are not allowed (only xlsx)", extension);
+                Console.WriteLine("{0} files are not allowed (only xlsx)", extension);
                 return;
             }
 
@@ -44,49 +73,25 @@ namespace ReportLockerApp
                 return;
             }
 
-            ReportLocker reportLocker = new ReportLocker();
+            string[] files;
 
-            if (!folder)
+            if (folder)
+                files = Directory.GetFiles(args[1], "*.xlsx");
+            else
             {
-                if (args[0] == "--lock")
-                {
-                    if (reportLocker.Lock(args[1], args[2]))
-                        Console.WriteLine("Report {0} locked", args[1]);
-                    else
-                        Console.WriteLine("Report {0} lock failed", args[1]);
-                }
-                else if (args[0] == "--unlock")
-                {
-                    if (reportLocker.Unlock(args[1]))
-                        Console.WriteLine("Report {0} unlocked", args[1]);
-                    else
-                        Console.WriteLine("Report {0} unlock failed", args[1]);
-                }
-                else if (args[0] == "--check")
-                {
-                    ReportLocker.Protection result = reportLocker.GetProtection(args[1]);
-
-                    Console.WriteLine("Report {0} is {1}", args[1], result.ToString());
-                }
-                else if (args[0] == "--sign")
-                {
-                    if (!uint.TryParse(args[4], out uint row))
-                        Console.WriteLine("Wrong format for row parameter");
-                    else if (reportLocker.SignReport(args[1], args[2], args[3], row, args[5]))
-                        Console.WriteLine("Report {0} signed", args[1]);
-                    else
-                        Console.WriteLine("Report {0} not signed", args[1]);
-                }
+                files = new string[1];
+                files[0] = args[1];
             }
-            else 
-            {
-                string[] files = Directory.GetFiles(args[1], "*.xlsx");
-                int count = 0;
 
-                foreach (string file in files)
+            var count = 0;
+
+            var reportLocker = new ReportLocker();
+
+            foreach (string file in files)
+            {
+                switch (args[0])
                 {
-                    if (args[0] == "--lock")
-                    {
+                    case "--lock":
                         if (reportLocker.Lock(file, args[2]))
                         {
                             count++;
@@ -94,9 +99,9 @@ namespace ReportLockerApp
                         }
                         else
                             Console.WriteLine("Report {0} lock failed", file);
-                    }
-                    else if (args[0] == "--unlock")
-                    {
+                        break;
+
+                    case "--unlock":
                         if (reportLocker.Unlock(file))
                         {
                             count++;
@@ -104,17 +109,24 @@ namespace ReportLockerApp
                         }
                         else
                             Console.WriteLine("Report {0} unlock failed", file);
-                    }
-                    else if (args[0] == "--check")
-                    {
+                        break;
+
+                    case "--check":
                         ReportLocker.Protection result = reportLocker.GetProtection(file);
 
                         Console.WriteLine("Report {0} is {1}", file, result.ToString());
-                    }
-                }
+                        break;
 
-                Console.WriteLine("{0} files {1} processed ", files.Length, count);
+                    case "--sign":
+                        if (reportLocker.SignReport(file, args[2], args[3], row, args[5]))
+                            Console.WriteLine("Report {0} signed", file);
+                        else
+                            Console.WriteLine("Report {0} not signed", file);
+                        break;
+                }
             }
+
+            Console.WriteLine("{0} files {1} processed ", files.Length, count);
         }
     }
 }

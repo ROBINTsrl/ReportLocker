@@ -8,7 +8,8 @@ namespace ReportLockerAPI
 {
     public class ReportLocker
     {
-        public enum Protection {
+        public enum Protection
+        {
             Unlocked = 0,
             Locked = 1,
             Crypted = 2
@@ -107,7 +108,8 @@ namespace ReportLockerAPI
                     }
                 }
             }
-            catch (System.IO.FileFormatException) {
+            catch (System.IO.FileFormatException)
+            {
                 return Protection.Crypted;
             }
 
@@ -228,10 +230,7 @@ namespace ReportLockerAPI
         {
             Row _row = worksheet.GetFirstChild<SheetData>()
                 .Elements<Row>()
-                .FirstOrDefault(r => r.RowIndex == row);
-
-            if (_row == null)
-                throw new ArgumentException(String.Format("No row with index {0} found in spreadsheet", row));
+                .FirstOrDefault(r => r.RowIndex == row) ?? throw new ArgumentException(string.Format("No row with index {0} found in spreadsheet", row));
 
             return _row;
         }
