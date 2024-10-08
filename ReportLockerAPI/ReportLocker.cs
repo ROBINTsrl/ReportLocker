@@ -69,11 +69,10 @@ namespace ReportLockerAPI
             {
                 using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, true))
                 {
-                    var filesharing = document.WorkbookPart.Workbook.FileSharing;
-
-                    if (filesharing != null)
+                    if (document.WorkbookPart.Workbook.FileSharing != null)
                     {
                         document.WorkbookPart.Workbook.FileSharing.Remove();
+                        document.WorkbookPart.Workbook.Save();
                     }
                     
                     foreach (var part in document.WorkbookPart.WorksheetParts)
@@ -108,9 +107,7 @@ namespace ReportLockerAPI
             {
                 using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, false))
                 {
-                    var filesharing = document.WorkbookPart.Workbook.FileSharing;
-
-                    if (filesharing != null)
+                    if (document.WorkbookPart.Workbook.FileSharing != null)
                     {
                         return Protection.Locked;
                     }
