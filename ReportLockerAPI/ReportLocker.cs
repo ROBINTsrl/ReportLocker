@@ -69,11 +69,20 @@ namespace ReportLockerAPI
             {
                 using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, true))
                 {
+                    var filesharing = document.WorkbookPart.Workbook.FileSharing;
+
+                    if (filesharing != null)
+                    {
+                        document.WorkbookPart.Workbook.FileSharing.Remove();
+                    }
+                    
                     foreach (var part in document.WorkbookPart.WorksheetParts)
                     {
                         part.Worksheet.RemoveAllChildren<SheetProtection>();
                         part.Worksheet.Save();
                     }
+
+                    document.Save();
                 }
             }
             catch (System.IO.FileFormatException)
@@ -99,6 +108,13 @@ namespace ReportLockerAPI
             {
                 using (SpreadsheetDocument document = SpreadsheetDocument.Open(report, false))
                 {
+                    var filesharing = document.WorkbookPart.Workbook.FileSharing;
+
+                    if (filesharing != null)
+                    {
+                        return Protection.Locked;
+                    }
+
                     foreach (var part in document.WorkbookPart.WorksheetParts)
                     {
                         var protections = part.Worksheet.Elements<SheetProtection>();
